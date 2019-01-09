@@ -3,38 +3,26 @@ import 'package:redux_example/redux/AppState.dart';
 import 'package:redux_example/redux/Actions.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
+enum BUTTONCASE { INCREMENT, DECREMENT }
+
 class MainBody extends StatelessWidget {
-  Widget _incrementButton() {
+  Widget _createButton(BUTTONCASE buttoncase) {
     return StoreConnector<AppState, VoidCallback>(
       converter: (store) {
-        return () => store.dispatch(IncrementAction(1));
+        return buttoncase == BUTTONCASE.INCREMENT
+            ? () => store.dispatch(incrementAsyncAction)
+            : () => store.dispatch(decrementAsyncAfter(Duration(seconds: 6)));
       },
       builder: (context, method) {
         return RaisedButton(
           onPressed: method,
           child: Text(
-            '+',
+            buttoncase == BUTTONCASE.INCREMENT ? '+' : '-',
             style: TextStyle(fontSize: 25, color: Colors.white),
           ),
-          color: Colors.teal,
-        );
-      },
-    );
-  }
-
-  Widget _decrementButton() {
-    return StoreConnector<AppState, VoidCallback>(
-      converter: (store) {
-        return () => store.dispatch(DecrementAction(1));
-      },
-      builder: (context, method) {
-        return RaisedButton(
-          onPressed: method,
-          child: Text(
-            '-',
-            style: TextStyle(fontSize: 25, color: Colors.deepOrange),
-          ),
-          color: Colors.teal,
+          color: buttoncase == BUTTONCASE.INCREMENT
+              ? Colors.teal
+              : Colors.deepOrange,
         );
       },
     );
@@ -52,8 +40,8 @@ class MainBody extends StatelessWidget {
                   converter: (store) => store.state.counter.toString(),
                   builder: (context, currenCount) => Text(currenCount),
                 )),
-            _incrementButton(),
-            _decrementButton()
+            _createButton(BUTTONCASE.INCREMENT),
+            _createButton(BUTTONCASE.DECREMENT)
           ],
         ),
       ),
